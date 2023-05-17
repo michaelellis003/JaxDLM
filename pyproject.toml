@@ -1,23 +1,23 @@
+
+[project]
+name = "jaxdlm"
+version = "0.0.3"
+description = "A python package for Dynamic Linear Models using Jax"
+authors = [
+    {name = "Michael Ellis", email = "michael@mlellis.com"},
+]
+dependencies = [
+    "jax>=0.4.10",
+]
+requires-python = ">=3.11"
+readme = "README.md"
+license = {text = "MIT"}
+
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[project]
-name = "jaxdlm"
-version = "0.0.2"
-authors = [
-  { name="Michael Ellis", email="michael@mlellis.com" },
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=7.3.1",
 ]
-description = "A Jax based python package for dynamic linear models"
-readme = "README.md"
-requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
-]
-keywords = ["jax", "dynamic linear models", "time series", "state space models"]
-
-[project.urls]
-"GitHub" = "https://github.com/michaelellis003/JaxDLM"
-

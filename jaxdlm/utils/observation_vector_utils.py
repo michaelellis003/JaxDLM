@@ -20,15 +20,7 @@ def construct_observation_vector(trend_order, seasonal_periods, num_harmonics, s
     obs_vectors = [obs_trend_vector, obs_seasonal_vector]
     obs_vectors = [m for m in obs_vectors if m is not None]
 
-    if not obs_vectors:
-        warnings.warn(f"obs_vector is being set to None. All arguments either 0 or None."
-                      f"trend_order = {trend_order}, "
-                      f"seasonal_periods = {seasonal_periods},"
-                      f"num_harmonics = {num_harmonics},"
-                      f"seasonal_representation = {seasonal_representation}")
-        obs_vector = None
-    else:
-        obs_vector = jnp.concatenate(obs_vectors)
+    obs_vector = jnp.concatenate(obs_vectors)
 
     return obs_vector
 

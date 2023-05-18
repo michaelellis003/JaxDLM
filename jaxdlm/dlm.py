@@ -17,15 +17,25 @@ class DynamicLinearModel:
         self.seasonal_representation = seasonal_representation
         self.__validate_inputs()
 
-        self.obs_vector = construct_observation_vector(self.trend_order,
+        if (self.trend_order is None or self.trend_order == 0) and self.seasonal_periods is None:
+            warnings.warn(f"obs_vector and state_matrix are being set to None. All arguments either 0 or None."
+                          f"trend_order = {trend_order}, "
+                          f"seasonal_periods = {seasonal_periods},"
+                          f"num_harmonics = {num_harmonics},"
+                          f"seasonal_representation = {seasonal_representation}")
+
+            self.obs_vector = None
+            self.state_matrix = None
+        else:
+            self.obs_vector = construct_observation_vector(self.trend_order,
+                                                           self.seasonal_periods,
+                                                           self.num_harmonics,
+                                                           self.seasonal_representation)
+
+            self.state_matrix = construct_state_matrix(self.trend_order,
                                                        self.seasonal_periods,
                                                        self.num_harmonics,
                                                        self.seasonal_representation)
-
-        self.state_matrix = construct_state_matrix(self.trend_order,
-                                                   self.seasonal_periods,
-                                                   self.num_harmonics,
-                                                   self.seasonal_representation)
 
     def __validate_inputs(self):
         def is_int_and_gt(val, min_val, arg_name):

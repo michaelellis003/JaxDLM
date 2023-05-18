@@ -19,16 +19,7 @@ def construct_state_matrix(trend_order, seasonal_periods, num_harmonics, seasona
     # Filter out None matrices and construct the block diagonal state matrix
     state_matrices = [state_trend_matrix, state_seasonal_matrix]
     state_matrices = [m for m in state_matrices if m is not None]
-
-    if not state_matrices:
-        warnings.warn(f"state_matrix is being set to None. All arguments either 0 or None."
-                      f"trend_order = {trend_order}, "
-                      f"seasonal_periods = {seasonal_periods},"
-                      f"num_harmonics = {num_harmonics},"
-                      f"seasonal_representation = {seasonal_representation}")
-        state_matrix = None
-    else:
-        state_matrix = block_diag(*state_matrices)
+    state_matrix = block_diag(*state_matrices)
 
     return state_matrix
 

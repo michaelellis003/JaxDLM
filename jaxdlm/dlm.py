@@ -28,34 +28,33 @@ class DynamicLinearModel:
                                                    self.seasonal_representation)
 
     def __validate_inputs(self):
-        if self.trend_order is not None and not isinstance(self.trend_order, int):
-            raise TypeError("The trend_order argument must be an integer greater than or equal to 0.")
+        def is_int_and_gt(val, min_val, arg_name):
+            """Check if value is an integer and greater than min_val."""
+            if val is not None:
+                if not isinstance(val, int):
+                    raise TypeError(f"The {arg_name} argument must be an integer greater than or equal to {min_val}.")
+                if val < min_val:
+                    raise ValueError(f"The {arg_name} argument must be an integer greater than or equal to {min_val}.")
 
-        if self.trend_order is not None and self.trend_order < 0:
-            raise ValueError("The trend_order argument must be an integer greater than or equal to 0.")
+        # Check trend_order
+        is_int_and_gt(self.trend_order, 0, 'trend_order')
 
+        # Check seasonal_representation
         if self.seasonal_representation not in ["seasonal_factor", "fourier", None]:
             raise ValueError("seasonal_representation argument must be either 'seasonal_factor' or 'fourier' or None.")
 
-        if self.seasonal_representation == 'seasonal_factor' and not isinstance(self.seasonal_periods, int):
-            raise TypeError("The seasonal_periods argument must be an integer greater than or equal to 2 when using "
-                            "seasonal_representation == 'seasonal_factor'.")
+        # Check seasonal_periods
+        if self.seasonal_representation == 'seasonal_factor':
+            is_int_and_gt(self.seasonal_periods, 2, 'seasonal_periods')
 
-        if self.seasonal_periods is not None and self.seasonal_periods < 2:
-            raise ValueError("The seasonal_periods argument must be greater than or equal to 2.")
-
-        if self.num_harmonics is not None and not isinstance(self.num_harmonics, int):
-            raise ValueError("The num_harmonics argument must be an integer greater than or equal to 1.")
-
-        if self.num_harmonics is not None and self.num_harmonics < 1:
-            raise ValueError("The num_harmonics argument must be an integer greater than or equal to 1.")
+        # Check num_harmonics
+        is_int_and_gt(self.num_harmonics, 1, 'num_harmonics')
 
         if self.num_harmonics is not None and self.seasonal_representation == "seasonal_factor":
             warnings.warn("The num_harmonics argument will be ignored when using the 'seasonal_factor' representation.")
 
-        if self.seasonal_periods is not None and self.num_harmonics is not None \
-                and self.seasonal_representation == "fourier":
-
+        # Check relationship between num_harmonics and seasonal_periods
+        if self.seasonal_periods is not None and self.num_harmonics is not None and self.seasonal_representation == "fourier":
             if self.seasonal_periods % 2 == 0 and self.num_harmonics > self.seasonal_periods / 2:
                 raise ValueError("When seasonal_periods is even, num_harmonics can be at most seasonal_periods/2.")
             elif self.seasonal_periods % 2 == 1 and self.num_harmonics > (self.seasonal_periods - 1) / 2:

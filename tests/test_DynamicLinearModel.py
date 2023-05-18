@@ -118,3 +118,8 @@ def test_init_with_yearly_seasonal_periods_seasonal_factor():
                                                           ]
                                                          )
                            )
+
+########## SEASONAL FACTOR ONLY MODEL TESTS ##########
+def test_init_with_non_integer_seasonal_periods_seasonal_factor():
+    with pytest.raises(TypeError):
+        DynamicLinearModel(seasonal_periods=1.5, seasonal_representation='seasonal_factor')

@@ -12,8 +12,14 @@ class DynamicLinearModel:
                  ):
 
         self.trend_order = trend_order
-        self.seasonal_periods = seasonal_periods
-        self.num_harmonics = num_harmonics
+        if isinstance(seasonal_periods, int):
+            self.seasonal_periods = [seasonal_periods]
+        else:
+            self.seasonal_periods = seasonal_periods
+        if isinstance(num_harmonics, int):
+            self.num_harmonics = [num_harmonics]
+        else:
+            self.num_harmonics = num_harmonics
         self.seasonal_representation = seasonal_representation
         self.__validate_inputs()
 
@@ -55,17 +61,30 @@ class DynamicLinearModel:
 
         # Check seasonal_periods
         if self.seasonal_representation == 'seasonal_factor':
-            is_int_and_gt(self.seasonal_periods, 2, 'seasonal_periods')
+            if self.seasonal_periods is not None:
+                for sp in self.seasonal_periods:
+                    is_int_and_gt(sp, 2, 'seasonal_periods')
 
         # Check num_harmonics
-        is_int_and_gt(self.num_harmonics, 1, 'num_harmonics')
+        if self.seasonal_representation == 'fourier':
+            if self.num_harmonics is not None:
+                for nh in self.num_harmonics:
+                    is_int_and_gt(nh, 1, 'num_harmonics')
+
+            if self.seasonal_periods is not None and self.num_harmonics is not None:
+                if len(self.seasonal_periods) != len(self.num_harmonics):
+                    raise ValueError("seasonal_periods and num_harmonics must have the same length.")
 
         if self.num_harmonics is not None and self.seasonal_representation == "seasonal_factor":
             warnings.warn("The num_harmonics argument will be ignored when using the 'seasonal_factor' representation.")
 
         # Check relationship between num_harmonics and seasonal_periods
         if self.seasonal_periods is not None and self.num_harmonics is not None and self.seasonal_representation == "fourier":
-            if self.seasonal_periods % 2 == 0 and self.num_harmonics > self.seasonal_periods / 2:
-                raise ValueError("When seasonal_periods is even, num_harmonics can be at most seasonal_periods/2.")
-            elif self.seasonal_periods % 2 == 1 and self.num_harmonics > (self.seasonal_periods - 1) / 2:
-                raise ValueError("When seasonal_periods is odd, num_harmonics can be at most (seasonal_periods - 1)/2.")
+            for sp in self.seasonal_periods:
+                for nh in self.num_harmonics:
+                    if sp % 2 == 0 and nh > sp / 2:
+                        raise ValueError(f"When seasonal_periods is even, num_harmonics can be at most seasonal_periods/2. "
+                                         f"seasonal_periods = {sp}, num_harmonics = {nh}")
+                    elif sp % 2 == 1 and nh > (sp - 1) / 2:
+                        raise ValueError(f"When seasonal_periods is odd, num_harmonics can be at most (seasonal_periods - 1)/2. "
+                                         f"seasonal_periods = {sp}, num_harmonics = {nh}")

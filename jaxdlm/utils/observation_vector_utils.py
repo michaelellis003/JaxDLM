@@ -8,16 +8,16 @@ def construct_observation_vector(trend_order, seasonal_periods, num_harmonics, s
     else:
         obs_trend_vector = __trend_vector(trend_order)
 
-    if seasonal_periods is None:
-        obs_seasonal_vector = None
-    else:
-        if seasonal_representation == 'seasonal_factor':
-            obs_seasonal_vector = __seasonal_factor_vector(seasonal_periods)
-        else:  # fourier
-            obs_seasonal_vector = __seasonal_fourier_vector(seasonal_periods, num_harmonics)
+    obs_seasonal_vectors = []
+    if seasonal_periods is not None:
+        for i in range(len(seasonal_periods)):
+            if seasonal_representation == 'seasonal_factor':
+                obs_seasonal_vectors.append(__seasonal_factor_vector(seasonal_periods[i]))
+            else:  # fourier
+                obs_seasonal_vectors.append(__seasonal_fourier_vector(seasonal_periods[i], num_harmonics[i]))
 
-    # Filter out None matrices and construct the block diagonal state matrix
-    obs_vectors = [obs_trend_vector, obs_seasonal_vector]
+    # Filter out None matrices
+    obs_vectors = [obs_trend_vector] + obs_seasonal_vectors
     obs_vectors = [m for m in obs_vectors if m is not None]
 
     obs_vector = jnp.concatenate(obs_vectors)

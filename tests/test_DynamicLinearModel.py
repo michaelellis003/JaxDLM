@@ -24,8 +24,6 @@ def test_init_with_wrong_trend_order(trend_order, exc):
 ])
 def test_init_with_valid_trend_order(trend_order, obs_vector, state_matrix):
     model = DynamicLinearModel(trend_order=trend_order)
-    print(model.obs_vector)
-    print(model.state_matrix)
     assert model.trend_order == trend_order
     assert jnp.array_equal(model.obs_vector, obs_vector)
     assert jnp.array_equal(model.state_matrix, state_matrix)
@@ -53,7 +51,7 @@ def test_init_with_wrong_seasonal_periods_seasonal_factor(seasonal_periods, exc)
 ])
 def test_init_with_valid_seasonal_periods_seasonal_factor(seasonal_periods, obs_vector, state_matrix):
     model = DynamicLinearModel(seasonal_periods=seasonal_periods, seasonal_representation='seasonal_factor')
-    assert model.seasonal_periods == seasonal_periods
+    assert model.seasonal_periods == [seasonal_periods]
     assert jnp.array_equal(model.obs_vector, obs_vector)
     assert jnp.array_equal(model.state_matrix, state_matrix)
 
@@ -65,7 +63,7 @@ def test_init_with_valid_seasonal_periods_seasonal_factor(seasonal_periods, obs_
 def test_init_with_trend_order_and_seasonal_periods(trend_order, seasonal_periods, obs_vector, state_matrix):
     model = DynamicLinearModel(trend_order=trend_order, seasonal_periods=seasonal_periods, seasonal_representation='seasonal_factor')
     assert model.trend_order == trend_order
-    assert model.seasonal_periods == seasonal_periods
+    assert model.seasonal_periods == [seasonal_periods]
     assert jnp.array_equal(model.obs_vector, obs_vector)
     assert jnp.array_equal(model.state_matrix, state_matrix)
 

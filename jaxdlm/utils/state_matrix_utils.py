@@ -2,22 +2,23 @@ import warnings
 import jax.numpy as jnp
 from jax.scipy.linalg import block_diag
 
+
 def construct_state_matrix(trend_order, seasonal_periods, num_harmonics, seasonal_representation):
     if trend_order == 0 or trend_order is None:
         state_trend_matrix = None
     else:
         state_trend_matrix = __trend_matrix(trend_order)
 
-    if seasonal_periods is None:
-        state_seasonal_matrix = None
-    else:
-        if seasonal_representation == 'seasonal_factor':
-            state_seasonal_matrix = __seasonal_factor_matrix(seasonal_periods)
-        else: # fourier
-            state_seasonal_matrix = _seasonal_fourier_matrix(seasonal_periods, num_harmonics)
+    state_seasonal_matrices = []
+    if seasonal_periods is not None:
+        for i in range(len(seasonal_periods)):
+            if seasonal_representation == 'seasonal_factor':
+                state_seasonal_matrices.append(__seasonal_factor_matrix(seasonal_periods[i]))
+            else:  # fourier
+                state_seasonal_matrices.append(_seasonal_fourier_matrix(seasonal_periods[i], num_harmonics[i]))
 
     # Filter out None matrices and construct the block diagonal state matrix
-    state_matrices = [state_trend_matrix, state_seasonal_matrix]
+    state_matrices = [state_trend_matrix] + state_seasonal_matrices
     state_matrices = [m for m in state_matrices if m is not None]
     state_matrix = block_diag(*state_matrices)
 
@@ -52,9 +53,10 @@ def __seasonal_factor_matrix(seasonal_periods):
 
     return state_seasonal_factor_matrix
 
+
 def _seasonal_fourier_matrix(seasonal_periods, num_harmonics):
     last_h_nyquist_frequency = False
-    if seasonal_periods % 2 == 0 and num_harmonics == seasonal_periods/2:
+    if seasonal_periods % 2 == 0 and num_harmonics == seasonal_periods / 2:
         # if seasonal_periods is even and num_harmonics is exactly half of num_harmonics then we ignore the last
         # dimension
         last_h_nyquist_frequency = True
@@ -62,7 +64,7 @@ def _seasonal_fourier_matrix(seasonal_periods, num_harmonics):
     # For each harmonic, construct the Hj matrix and add it to the state matrix
     h_list = []
     for j in range(num_harmonics):
-        if j+1 == num_harmonics and last_h_nyquist_frequency:
+        if j + 1 == num_harmonics and last_h_nyquist_frequency:
             h_j = jnp.array([[-1.0]])
         else:
             wj = 2 * jnp.pi * (j + 1) / seasonal_periods

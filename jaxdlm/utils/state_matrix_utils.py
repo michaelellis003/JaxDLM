@@ -15,7 +15,7 @@ def construct_state_matrix(trend_order, seasonal_periods, num_harmonics, seasona
             if seasonal_representation == 'seasonal_factor':
                 state_seasonal_matrices.append(__seasonal_factor_matrix(seasonal_periods[i]))
             else:  # fourier
-                state_seasonal_matrices.append(_seasonal_fourier_matrix(seasonal_periods[i], num_harmonics[i]))
+                state_seasonal_matrices.append(__seasonal_fourier_matrix(seasonal_periods[i], num_harmonics[i]))
 
     # Filter out None matrices and construct the block diagonal state matrix
     state_matrices = [state_trend_matrix] + state_seasonal_matrices
@@ -54,7 +54,7 @@ def __seasonal_factor_matrix(seasonal_periods):
     return state_seasonal_factor_matrix
 
 
-def _seasonal_fourier_matrix(seasonal_periods, num_harmonics):
+def __seasonal_fourier_matrix(seasonal_periods, num_harmonics):
     last_h_nyquist_frequency = False
     if seasonal_periods % 2 == 0 and num_harmonics == seasonal_periods / 2:
         # if seasonal_periods is even and num_harmonics is exactly half of num_harmonics then we ignore the last

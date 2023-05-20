@@ -3,7 +3,7 @@ from jaxdlm.dlm import DynamicLinearModel
 from jaxdlm.utils import observation_vector_utils
 from jaxdlm.utils import state_matrix_utils
 import jax.numpy as jnp
-
+from jax.scipy.linalg import block_diag
 
 @pytest.mark.parametrize("trend_order, seasonal_periods, num_harmonics, seasonal_representation", [
     (2, None, None, None),
@@ -122,48 +122,86 @@ def test_seasonal_fourier_vector(seasonal_periods, num_harmonics, seasonal_fouri
 ])
 def test_construct_observation_vector(trend_order, seasonal_periods, num_harmonics, seasonal_representation,
                                       observation_vector):
-    print(observation_vector_utils.construct_observation_vector(trend_order, seasonal_periods,
-                                                                num_harmonics, seasonal_representation))
-    print(observation_vector)
     assert jnp.array_equal(observation_vector_utils.construct_observation_vector(trend_order, seasonal_periods,
-                                                                                 num_harmonics, seasonal_representation),
+                                                                                 num_harmonics,
+                                                                                 seasonal_representation),
                            observation_vector)
 
-# @pytest.mark.parametrize("trend_order, obs_vector, state_matrix", [
-#     (1, jnp.array([1.0]), jnp.array([[1.0]])),
-#     (2, jnp.array([1.0, 0.0]), jnp.array([[1.0, 1.0], [0.0, 1.0]])),
-#     (4, jnp.array([1.0, 0.0, 0.0, 0.0]), jnp.array([[1.0, 1.0, 0.0, 0.0],
-#                                                     [0.0, 1.0, 1.0, 0.0],
-#                                                     [0.0, 0.0, 1.0, 1.0],
-#                                                     [0.0, 0.0, 0.0, 1.0]]))
-# ])
-# def test_init_with_valid_trend_order(trend_order, obs_vector, state_matrix):
-#     model = DynamicLinearModel(trend_order=trend_order)
-#     assert model.trend_order == trend_order
-#     assert jnp.array_equal(model.obs_vector, obs_vector)
-#     assert jnp.array_equal(model.state_matrix, state_matrix)
-#
-#
-# ########## SEASONAL FACTOR ONLY MODEL TESTS ##########
-# @pytest.mark.parametrize("seasonal_periods, obs_vector, state_matrix", [
-#     # include cases for each seasonal period as per your requirement
-#     (4, jnp.array([1.0, 0.0, 0.0]), jnp.array([[-1, -1, -1], [1, 0, 0], [0, 1, 0]]))
-# ])
-# def test_init_with_valid_seasonal_periods_seasonal_factor(seasonal_periods, obs_vector, state_matrix):
-#     model = DynamicLinearModel(seasonal_periods=seasonal_periods, seasonal_representation='seasonal_factor')
-#     assert model.seasonal_periods == [seasonal_periods]
-#     assert jnp.array_equal(model.obs_vector, obs_vector)
-#     assert jnp.array_equal(model.state_matrix, state_matrix)
-#
-#
-# ########## TREND AND SEASONAL FACTOR MODEL TESTS ##########
-# @pytest.mark.parametrize("trend_order, seasonal_periods, obs_vector, state_matrix", [
-#     (1, 4, jnp.array([1.0, 1.0, 0.0, 0.0]), jnp.array([[1, 0, 0, 0], [0, -1, -1, -1], [0, 1, 0, 0], [0, 0, 1, 0]]))
-# ])
-# def test_init_with_trend_order_and_seasonal_periods(trend_order, seasonal_periods, obs_vector, state_matrix):
-#     model = DynamicLinearModel(trend_order=trend_order, seasonal_periods=seasonal_periods,
-#                                seasonal_representation='seasonal_factor')
-#     assert model.trend_order == trend_order
-#     assert model.seasonal_periods == [seasonal_periods]
-#     assert jnp.array_equal(model.obs_vector, obs_vector)
-#     assert jnp.array_equal(model.state_matrix, state_matrix)
+
+@pytest.mark.parametrize("trend_order, trend_order_matrix", [
+    (1, jnp.array([[1.0]])),
+    (2, jnp.array([[1.0, 1.0],
+                   [0.0, 1.0]
+                   ])),
+    (4, jnp.array([[1.0, 1.0, 0.0, 0.0],
+                    [0.0, 1.0, 1.0, 0.0],
+                    [0.0, 0.0, 1.0, 1.0],
+                    [0.0, 0.0, 0.0, 1.0]]))
+])
+def test_trend_matrix(trend_order, trend_order_matrix):
+    assert jnp.array_equal(state_matrix_utils.__trend_matrix(trend_order), trend_order_matrix)
+
+
+@pytest.mark.parametrize("seasonal_periods, seasonal_factor_order_matrix", [
+    (2, jnp.array([[-1]])),
+    (4, jnp.array([[-1, -1, -1], [1, 0, 0], [0, 1, 0]]))
+])
+def test_seasonal_factor_matrix(seasonal_periods, seasonal_factor_order_matrix):
+    assert jnp.array_equal(state_matrix_utils.__seasonal_factor_matrix(seasonal_periods), seasonal_factor_order_matrix)
+
+
+@pytest.mark.parametrize("seasonal_periods, num_harmonics, seasonal_fourier_matrix", [
+    (4, 2, jnp.array([[jnp.cos(2 * jnp.pi / 4), jnp.sin(2 * jnp.pi / 4), 0],
+                      [-jnp.sin(2 * jnp.pi / 4), jnp.cos(2 * jnp.pi / 4), 0],
+                      [0, 0, -1]
+                      ])
+     ),
+    (7, 2, block_diag(jnp.array([[jnp.cos(2 * jnp.pi / 7), jnp.sin(2 * jnp.pi / 7)],
+                                  [-jnp.sin(2 * jnp.pi / 7), jnp.cos(2 * jnp.pi / 7)]]),
+                        jnp.array([[jnp.cos(2 * jnp.pi * 2 / 7), jnp.sin(2 * jnp.pi * 2 / 7)],
+                                  [-jnp.sin(2 * jnp.pi * 2 / 7), jnp.cos(2 * jnp.pi * 2/ 7)]])
+                       )
+     ),
+    (12, 2, block_diag(jnp.array([[jnp.cos(2 * jnp.pi / 12), jnp.sin(2 * jnp.pi / 12)],
+                                  [-jnp.sin(2 * jnp.pi / 12), jnp.cos(2 * jnp.pi / 12)]]),
+                        jnp.array([[jnp.cos(2 * jnp.pi * 2 / 12), jnp.sin(2 * jnp.pi * 2 / 12)],
+                                  [-jnp.sin(2 * jnp.pi * 2 / 12), jnp.cos(2 * jnp.pi * 2/ 12)]])
+                       )
+    )
+])
+def test__seasonal_fourier_matrix(seasonal_periods, num_harmonics, seasonal_fourier_matrix):
+    assert jnp.array_equal(state_matrix_utils.__seasonal_fourier_matrix(seasonal_periods, num_harmonics), seasonal_fourier_matrix)
+
+
+@pytest.mark.parametrize("trend_order, seasonal_periods, num_harmonics, seasonal_representation, state_matrix", [
+    (None, [4], None, 'seasonal_factor', state_matrix_utils.__seasonal_factor_matrix(4)),
+    (None, [7, 4], None, 'seasonal_factor', block_diag(state_matrix_utils.__seasonal_factor_matrix(7),
+                                                       state_matrix_utils.__seasonal_factor_matrix(4)
+                                                       ),
+     ),
+    (None, [12, 4], [3, 2], 'fourier', block_diag(state_matrix_utils.__seasonal_fourier_matrix(12, 3),
+                                                  state_matrix_utils.__seasonal_fourier_matrix(4, 2)
+                                                  )
+     ),
+    (2, None, None, None, state_matrix_utils.__trend_matrix(2)),
+    (2, [4], None, 'seasonal_factor', block_diag(state_matrix_utils.__trend_matrix(2),
+                                                 state_matrix_utils.__seasonal_factor_matrix(4))
+    ),
+    (2, [7, 4], None, 'seasonal_factor', block_diag(state_matrix_utils.__trend_matrix(2),
+                                                    state_matrix_utils.__seasonal_factor_matrix(7),
+                                                    state_matrix_utils.__seasonal_factor_matrix(4),
+                                                    )
+     ),
+    (2, [12], [3], 'fourier', block_diag(state_matrix_utils.__trend_matrix(2),
+                                         state_matrix_utils.__seasonal_fourier_matrix(12, 3))
+    ),
+    (2, [12, 7], [3, 2], 'fourier', block_diag(state_matrix_utils.__trend_matrix(2),
+                                               state_matrix_utils.__seasonal_fourier_matrix(12, 3),
+                                               state_matrix_utils.__seasonal_fourier_matrix(7, 2)
+                                               )
+    )
+])
+def test_construct_state_matrix(trend_order, seasonal_periods, num_harmonics, seasonal_representation, state_matrix):
+    assert jnp.array_equal(state_matrix_utils.construct_state_matrix(trend_order, seasonal_periods, num_harmonics,
+                                                                     seasonal_representation),
+                           state_matrix)

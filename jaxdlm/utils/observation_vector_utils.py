@@ -51,6 +51,10 @@ def __seasonal_fourier_vector(seasonal_periods, num_harmonics):
         vector_len = (num_harmonics * 2)
 
     # Create an array that alternates between 1 and 0
-    obs_seasonal_fourier_vector = jnp.arange(2 * vector_len) % 2
+    obs_seasonal_fourier_vector = jnp.tile(jnp.array([1.0, 0.0]), vector_len // 2)
+
+    # If the length is odd, append 1.0 to the end of the pattern
+    if vector_len % 2:
+        obs_seasonal_fourier_vector = jnp.concatenate((obs_seasonal_fourier_vector, jnp.array([1.0])))
 
     return obs_seasonal_fourier_vector

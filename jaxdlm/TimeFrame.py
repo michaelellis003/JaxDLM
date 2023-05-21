@@ -79,17 +79,17 @@ class TimeFrame:
             series_name = self.auto_ts_id
             self.auto_ts_id += 1
 
-        if ts_datetime is None and not ts_datetime:
-            warnings.warn("Time is not provided, defaulting to sequence of integers.")
-            self.ts_datetime = list(range(max_ts_length - len(time_series), max_ts_length))
+        if ts_datetime is None and not self.ts_datetime:
+            warnings.warn("ts_datetime is not provided, defaulting to sequence of integers from 0 to {max_ts_length}-1.")
+            self.ts_datetime = list(range(0, max_ts_length))
         else:
-            self.ts_datetime = time = [parse_time_string(t) if isinstance(t, str) else t for t in ts_datetime]
+            if not self.ts_datetime:
+                ts_datetime = [parse_time_string(t) if isinstance(t, str) else t for t in ts_datetime]
 
-            if data_frequency is None:
-                data_frequency = ts_datetime[-1] - ts_datetime[-2]
-                warnings.warn(f"data_frequency is not provided, defaulting to inferred frequency of {data_frequency}.")
+                if data_frequency is None:
+                    data_frequency = ts_datetime[-1] - ts_datetime[-2]
+                    warnings.warn(f"data_frequency is not provided, defaulting to inferred frequency of {data_frequency}.")
 
-            if self.ts_datetime is None:
                 self.ts_datetime = [ts_datetime[-1] - data_frequency * i for i in range(max_ts_length)][::-1]
 
         # Create the new time series and regressors

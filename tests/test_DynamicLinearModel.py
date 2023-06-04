@@ -5,6 +5,7 @@ from jaxdlm.utils import state_matrix_utils
 import jax.numpy as jnp
 from jax.scipy.linalg import block_diag
 
+
 @pytest.mark.parametrize("trend_order, seasonal_periods, num_harmonics, seasonal_representation", [
     (2, None, None, None),
     (0, None, None, None),
@@ -134,9 +135,9 @@ def test_construct_observation_vector(trend_order, seasonal_periods, num_harmoni
                    [0.0, 1.0]
                    ])),
     (4, jnp.array([[1.0, 1.0, 0.0, 0.0],
-                    [0.0, 1.0, 1.0, 0.0],
-                    [0.0, 0.0, 1.0, 1.0],
-                    [0.0, 0.0, 0.0, 1.0]]))
+                   [0.0, 1.0, 1.0, 0.0],
+                   [0.0, 0.0, 1.0, 1.0],
+                   [0.0, 0.0, 0.0, 1.0]]))
 ])
 def test_trend_matrix(trend_order, trend_order_matrix):
     assert jnp.array_equal(state_matrix_utils.__trend_matrix(trend_order), trend_order_matrix)
@@ -157,20 +158,21 @@ def test_seasonal_factor_matrix(seasonal_periods, seasonal_factor_order_matrix):
                       ])
      ),
     (7, 2, block_diag(jnp.array([[jnp.cos(2 * jnp.pi / 7), jnp.sin(2 * jnp.pi / 7)],
-                                  [-jnp.sin(2 * jnp.pi / 7), jnp.cos(2 * jnp.pi / 7)]]),
-                        jnp.array([[jnp.cos(2 * jnp.pi * 2 / 7), jnp.sin(2 * jnp.pi * 2 / 7)],
-                                  [-jnp.sin(2 * jnp.pi * 2 / 7), jnp.cos(2 * jnp.pi * 2/ 7)]])
-                       )
+                                 [-jnp.sin(2 * jnp.pi / 7), jnp.cos(2 * jnp.pi / 7)]]),
+                      jnp.array([[jnp.cos(2 * jnp.pi * 2 / 7), jnp.sin(2 * jnp.pi * 2 / 7)],
+                                 [-jnp.sin(2 * jnp.pi * 2 / 7), jnp.cos(2 * jnp.pi * 2 / 7)]])
+                      )
      ),
     (12, 2, block_diag(jnp.array([[jnp.cos(2 * jnp.pi / 12), jnp.sin(2 * jnp.pi / 12)],
                                   [-jnp.sin(2 * jnp.pi / 12), jnp.cos(2 * jnp.pi / 12)]]),
-                        jnp.array([[jnp.cos(2 * jnp.pi * 2 / 12), jnp.sin(2 * jnp.pi * 2 / 12)],
-                                  [-jnp.sin(2 * jnp.pi * 2 / 12), jnp.cos(2 * jnp.pi * 2/ 12)]])
+                       jnp.array([[jnp.cos(2 * jnp.pi * 2 / 12), jnp.sin(2 * jnp.pi * 2 / 12)],
+                                  [-jnp.sin(2 * jnp.pi * 2 / 12), jnp.cos(2 * jnp.pi * 2 / 12)]])
                        )
-    )
+     )
 ])
 def test__seasonal_fourier_matrix(seasonal_periods, num_harmonics, seasonal_fourier_matrix):
-    assert jnp.array_equal(state_matrix_utils.__seasonal_fourier_matrix(seasonal_periods, num_harmonics), seasonal_fourier_matrix)
+    assert jnp.array_equal(state_matrix_utils.__seasonal_fourier_matrix(seasonal_periods, num_harmonics),
+                           seasonal_fourier_matrix)
 
 
 @pytest.mark.parametrize("trend_order, seasonal_periods, num_harmonics, seasonal_representation, state_matrix", [
@@ -186,7 +188,7 @@ def test__seasonal_fourier_matrix(seasonal_periods, num_harmonics, seasonal_four
     (2, None, None, None, state_matrix_utils.__trend_matrix(2)),
     (2, [4], None, 'seasonal_factor', block_diag(state_matrix_utils.__trend_matrix(2),
                                                  state_matrix_utils.__seasonal_factor_matrix(4))
-    ),
+     ),
     (2, [7, 4], None, 'seasonal_factor', block_diag(state_matrix_utils.__trend_matrix(2),
                                                     state_matrix_utils.__seasonal_factor_matrix(7),
                                                     state_matrix_utils.__seasonal_factor_matrix(4),
@@ -194,12 +196,12 @@ def test__seasonal_fourier_matrix(seasonal_periods, num_harmonics, seasonal_four
      ),
     (2, [12], [3], 'fourier', block_diag(state_matrix_utils.__trend_matrix(2),
                                          state_matrix_utils.__seasonal_fourier_matrix(12, 3))
-    ),
+     ),
     (2, [12, 7], [3, 2], 'fourier', block_diag(state_matrix_utils.__trend_matrix(2),
                                                state_matrix_utils.__seasonal_fourier_matrix(12, 3),
                                                state_matrix_utils.__seasonal_fourier_matrix(7, 2)
                                                )
-    )
+     )
 ])
 def test_construct_state_matrix(trend_order, seasonal_periods, num_harmonics, seasonal_representation, state_matrix):
     assert jnp.array_equal(state_matrix_utils.construct_state_matrix(trend_order, seasonal_periods, num_harmonics,

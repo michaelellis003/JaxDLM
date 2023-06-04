@@ -24,10 +24,12 @@ class TSDateTime:
 
         if all(arg is None for arg in [min_ts_datetime, max_ts_datetime, ts_periods]) and max_ts_length is not None:
             self.ts_datetime = list(range(max_ts_length))
+            self.use_dates = False
         else:
             self.ts_datetime = pd.date_range(start=self.min_ts_datetime,
                                              end=self.max_ts_datetime,
-                                             periods=ts_periods)
+                                             periods=ts_periods).to_pydatetime().tolist()
+            self.use_dates = True
 
 
 class TimeSeries:

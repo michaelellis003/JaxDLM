@@ -26,6 +26,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "jaxtyping"
+version = "0.2.19"
+requires_python = "~=3.8"
+summary = "Type annotations and runtime checking for shape and dtype of JAX arrays, and PyTrees."
+dependencies = [
+    "numpy>=1.20.0",
+    "typeguard>=2.13.3",
+    "typing-extensions>=3.7.4.1",
+]
+
+[[package]]
 name = "ml-dtypes"
 version = "0.1.0"
 requires_python = ">=3.7"
@@ -118,6 +129,18 @@ requires_python = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 summary = "Python 2 and 3 compatibility utilities"
 
 [[package]]
+name = "typeguard"
+version = "4.0.0"
+requires_python = ">=3.7.4"
+summary = "Run-time type checker for Python"
+
+[[package]]
+name = "typing-extensions"
+version = "4.6.1"
+requires_python = ">=3.7"
+summary = "Backported and Experimental Type Hints for Python 3.7+"
+
+[[package]]
 name = "tzdata"
 version = "2023.3"
 requires_python = ">=2"
@@ -127,7 +150,7 @@ summary = "Provider of IANA time zone data"
 lock_version = "4.2"
 cross_platform = true
 groups = ["default", "test"]
-content_hash = "sha256:f7e175ec5922a6b448ae5d38edd41c6708886b1b2267cfa0887d155a69493ba5"
+content_hash = "sha256:51047591c1e19ee3ecaef696382f3691c6a60e0c1e4ee285e44d875a4d7610c6"
 
 [metadata.files]
 "colorama 0.4.6" = [
@@ -140,6 +163,10 @@ content_hash = "sha256:f7e175ec5922a6b448ae5d38edd41c6708886b1b2267cfa0887d155a6
 ]
 "jax 0.4.10" = [
     {url = "https://files.pythonhosted.org/packages/13/71/679a0ef6821a5fc71008e044a81e5c2da4fdee3a5aca9fea9fcfe594f163/jax-0.4.10.tar.gz", hash = "sha256:1bf0f2720f778f2937301a16a4d5cd3497f13a4d6c970c24a88918a81816a888"},
+]
+"jaxtyping 0.2.19" = [
+    {url = "https://files.pythonhosted.org/packages/6b/9f/1f8b63965b795803c5bc38afcfcf8ce8d922ffc65a26d4a08071279b0403/jaxtyping-0.2.19.tar.gz", hash = "sha256:21ff4c3caec6781cadfe980b019dde856c1011e17d11dfe8589298040056325a"},
+    {url = "https://files.pythonhosted.org/packages/7f/8f/b39d40fef81d7def4898ad11bbe686185e09cb9e39db905e2afc77f1d350/jaxtyping-0.2.19-py3-none-any.whl", hash = "sha256:651352032799d422987e783fd1b77699b53c3bb28ffa644bbca5f75ec4fbb843"},
 ]
 "ml-dtypes 0.1.0" = [
     {url = "https://files.pythonhosted.org/packages/03/e0/1f341b60e866653eb67322b8acc1b9cc601da7a7cc0f8f9494a3d43a8592/ml_dtypes-0.1.0-cp310-cp310-win_amd64.whl", hash = "sha256:ad765159ac6c18d5ee7d325fcf34d3106a9d9d7a49713d998f5cfa330a1459b4"},
@@ -267,6 +294,14 @@ content_hash = "sha256:f7e175ec5922a6b448ae5d38edd41c6708886b1b2267cfa0887d155a6
 "six 1.16.0" = [
     {url = "https://files.pythonhosted.org/packages/71/39/171f1c67cd00715f190ba0b100d606d440a28c93c7714febeca8b79af85e/six-1.16.0.tar.gz", hash = "sha256:1e61c37477a1626458e36f7b1d82aa5c9b094fa4802892072e49de9c60c4c926"},
     {url = "https://files.pythonhosted.org/packages/d9/5a/e7c31adbe875f2abbb91bd84cf2dc52d792b5a01506781dbcf25c91daf11/six-1.16.0-py2.py3-none-any.whl", hash = "sha256:8abb2f1d86890a2dfb989f9a77cfcfd3e47c2a354b01111771326f8aa26e0254"},
+]
+"typeguard 4.0.0" = [
+    {url = "https://files.pythonhosted.org/packages/5b/8f/88569f7e96b79210c0c06aea80b9c11bfc6779afdc552e8ab489b342d246/typeguard-4.0.0-py3-none-any.whl", hash = "sha256:c4a40af0ba8a41077221271b46d0a6d8d46045443e4d887887c69254ca861952"},
+    {url = "https://files.pythonhosted.org/packages/81/1f/38b3c89109c3efefd5d02073aa75e765ed5392288a1181cb6e82ee775c06/typeguard-4.0.0.tar.gz", hash = "sha256:194fb3dbcb06ea9caf7088f3befee014de57961689f9c859ac5239b1ef61d987"},
+]
+"typing-extensions 4.6.1" = [
+    {url = "https://files.pythonhosted.org/packages/82/ed/8ccf53a0ed10bf8fc8877b5833b40f5f99093cadfe6632b8892f74aead0f/typing_extensions-4.6.1-py3-none-any.whl", hash = "sha256:6bac751f4789b135c43228e72de18637e9a6c29d12777023a703fd1a6858469f"},
+    {url = "https://files.pythonhosted.org/packages/aa/67/f4e6ae6998b0c86ab10f8e96339f00afaf30bef11f63a81c63977c2b89d7/typing_extensions-4.6.1.tar.gz", hash = "sha256:558bc0c4145f01e6405f4a5fdbd82050bd221b119f4bf72a961a1cfd471349d6"},
 ]
 "tzdata 2023.3" = [
     {url = "https://files.pythonhosted.org/packages/70/e5/81f99b9fced59624562ab62a33df639a11b26c582be78864b339dafa420d/tzdata-2023.3.tar.gz", hash = "sha256:11ef1e08e54acb0d4f95bdb1be05da659673de4acbd21bf9c69e94cc5e907a3a"},

@@ -1,5 +1,5 @@
 import pytest
-from jaxdlm.dlm import DynamicLinearModel
+from jaxdlm.DLM import DynamicLinearModel
 from jaxdlm.utils import observation_vector_utils
 from jaxdlm.utils import state_matrix_utils
 import jax.numpy as jnp
